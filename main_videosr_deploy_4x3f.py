@@ -17,7 +17,7 @@ from modules.videosr_ops_lite import *
 
 os.environ["CUDA_VISIBLE_DEVICES"]=str(np.argmax( [int(x.split()[2]) for x in subprocess.Popen("nvidia-smi -q -d Memory | grep -A4 GPU | grep Free", shell=True, stdout=subprocess.PIPE).stdout.readlines()]))
 
-DATA_TEST='./data/test/calendar'
+DATA_TEST='./data/test/car05_001'
 # DATA_TEST='./data/test/hitachi_isee5_001'
 DATA_TRAIN='./data/train/'
 
@@ -36,23 +36,23 @@ class VIDEOSR(object):
         # inp = [scipy.misc.imresize(i, [120, 160]) / 255.0 for i in inp]
         inp = [i[:120, :160, :] for i in inp]
 
-        print 'Testing path: {}'.format(dataPath)
-        print '# of testing frames: {}'.format(len(inList))
+        print ('Testing path: {}'.format(dataPath))
+        print ('# of testing frames: {}'.format(len(inList)))
 
-        DATA_TEST_OUT = DATA_TEST+'_SR_{}'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+        DATA_TEST_OUT = DATA_TEST+'/../output/_SR_{}'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
         os.mkdir(DATA_TEST_OUT)
         
         cnt = 0
         self.scale_factor = scale_factor
         reuse = False
-        for idx0 in xrange(len(inList)):
+        for idx0 in range(len(inList)):
             cnt += 1
-            T = num_frames / 2
+            T = int(num_frames / 2)
 
-            imgs = [inp[0] for i in xrange(idx0 - T, 0)]
-            imgs.extend([inp[i] for i in xrange(max(0, idx0 - T), idx0)])
-            imgs.extend([inp[i] for i in xrange(idx0, min(len(inList), idx0 + T + 1))])
-            imgs.extend([inp[-1] for i in xrange(idx0 + T, len(inList) - 1, -1)])
+            imgs = [inp[0] for i in range(idx0 - T, 0)]
+            imgs.extend([inp[i] for i in range(max(0, idx0 - T), idx0)])
+            imgs.extend([inp[i] for i in range(idx0, min(len(inList), idx0 + T + 1))])
+            imgs.extend([inp[-1] for i in range(idx0 + T, len(inList) - 1, -1)])
 
             dims = imgs[0].shape
             if len(dims) == 2:
@@ -92,7 +92,7 @@ class VIDEOSR(object):
                 reuse = True
 
             case_path = dataPath.split('/')[-1]
-            print 'Testing - ', case_path, len(imgs)
+            print ('Testing - ', case_path, len(imgs))
             [imgs_hr, imgs_hr_rgb] = sess.run([output, output_rgb], feed_dict={frames_lr: imgs})
             
             scipy.misc.imsave(os.path.join(DATA_TEST_OUT, 'y_%03d.png'%(idx0)),
@@ -100,7 +100,7 @@ class VIDEOSR(object):
             if len(dims) == 3:
                 scipy.misc.imsave(os.path.join(DATA_TEST_OUT, 'rgb_%03d.png'%(idx0)),
                                   im2uint8(imgs_hr_rgb[0, -1, :, :, :]))
-        print 'SR results path: {}'.format(DATA_TEST_OUT)
+        print ('SR results path: {}'.format(DATA_TEST_OUT))
 
 
 def main(_):

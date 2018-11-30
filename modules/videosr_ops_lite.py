@@ -17,7 +17,7 @@ def get_shape(x):
     shape = tf.shape(x)
     check = tf.Assert(tf.reduce_all(shape >= 0), ["EASYFLOW: Need value.shape >= 0, got ", shape])
     shape = control_flow_ops.with_dependencies([check], shape)
-    return [shape[i] for i in xrange(shape.shape.as_list()[0])]
+    return [shape[i] for i in range(shape.shape.as_list()[0])]
 
 
 def zero_upsampling(x, scale_factor):
@@ -52,9 +52,9 @@ def prelu(x):
 
 
 def display_tf_variables(train_vars):
-    print 'Training Variables: '
+    print ('Training Variables: ')
     for var in train_vars:
-        print '\t', var.name
+        print ('\t', var.name)
 
 
 def resize_images(images, size, method=2, align_corners=False):
@@ -92,11 +92,11 @@ def rgb2ycbcr(inputs):
         origT = [[65.481, 128.553, 24.966], [-37.797, -74.203, 112], [112, -93.786, -18.214]]
         origOffset = [16.0, 128.0, 128.0]
         if ndims == 4:
-            origT = [tf.reshape(origT[i], [1, 1, 1, 3]) / 255.0 for i in xrange(3)]
+            origT = [tf.reshape(origT[i], [1, 1, 1, 3]) / 255.0 for i in range(3)]
         elif ndims == 5:
-            origT = [tf.reshape(origT[i], [1, 1, 1, 1, 3]) / 255.0 for i in xrange(3)]
+            origT = [tf.reshape(origT[i], [1, 1, 1, 1, 3]) / 255.0 for i in range(3)]
         output = []
-        for i in xrange(3):
+        for i in range(3):
             output.append(tf.reduce_sum(inputs * origT[i], reduction_indices=-1, keep_dims=True) + origOffset[i] / 255.0)
         return tf.concat(output, -1)
 
@@ -112,13 +112,13 @@ def ycbcr2rgb(inputs):
         Tinv = [[0.00456621, 0., 0.00625893], [0.00456621, -0.00153632, -0.00318811], [0.00456621, 0.00791071, 0.]]
         origOffset = [16.0, 128.0, 128.0]
         if ndims == 4:
-            origT = [tf.reshape(Tinv[i], [1, 1, 1, 3]) * 255.0 for i in xrange(3)]
+            origT = [tf.reshape(Tinv[i], [1, 1, 1, 3]) * 255.0 for i in range(3)]
             origOffset = tf.reshape(origOffset, [1, 1, 1, 3]) / 255.0
         elif ndims == 5:
-            origT = [tf.reshape(Tinv[i], [1, 1, 1, 1, 3]) * 255.0 for i in xrange(3)]
+            origT = [tf.reshape(Tinv[i], [1, 1, 1, 1, 3]) * 255.0 for i in range(3)]
             origOffset = tf.reshape(origOffset, [1, 1, 1, 1, 3]) / 255.0
         output = []
-        for i in xrange(3):
+        for i in range(3):
             output.append(tf.reduce_sum((inputs - origOffset) * origT[i], reduction_indices=-1, keep_dims=True))
         return tf.concat(output, -1)
     
